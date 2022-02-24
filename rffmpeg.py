@@ -77,6 +77,7 @@ try:
         "pre_commands": o_config["rffmpeg"]["commands"]["pre"],
         "ffmpeg_command": o_config["rffmpeg"]["commands"]["ffmpeg"],
         "ffprobe_command": o_config["rffmpeg"]["commands"]["ffprobe"],
+        "ffdetect_command": o_config["rffmpeg"]["commands"]["ffdetect"],
     }
 except Exception as e:
     log.error("ERROR: Failed to load configuration: %s is missing", e)
@@ -88,6 +89,7 @@ config["remote_persist_time"] = int(o_config["rffmpeg"]["remote"].get("persist",
 config["state_persistdir"] = o_config["rffmpeg"]["state"].get("persistdir", '/run/shm')
 config["fallback_ffmpeg_command"] = o_config["rffmpeg"]["commands"].get("fallback_ffmpeg", config["ffmpeg_command"])
 config["fallback_ffprobe_command"] = o_config["rffmpeg"]["commands"].get("fallback_ffprobe", config["ffprobe_command"])
+config["fallback_ffdetect_command"] = o_config["rffmpeg"]["commands"].get("fallback_ffdetect", config["ffdetect_command"])
 
 # Parse CLI args (ffmpeg command line)
 all_args = sys.argv
@@ -253,6 +255,9 @@ def setup_remote_command(target_host):
     if "ffprobe" in all_args[0]:
         rffmpeg_ffmpeg_command.append(config["ffprobe_command"])
         stdout = sys.stdout
+    elif "ffdetect" in all_args[0]:
+       rffmpeg_ffmpeg_command.append(config["ffdetect_command"])
+       stdout = sys.stdout
     else:
         rffmpeg_ffmpeg_command.append(config["ffmpeg_command"])
 
@@ -299,6 +304,9 @@ def run_local_ffmpeg():
     # Verify if we're in ffmpeg or ffprobe mode
     if "ffprobe" in all_args[0]:
         rffmpeg_ffmpeg_command.append(config["fallback_ffprobe_command"])
+        stdout = sys.stdout
+    elif "ffdetect" in all_args[0]:
+        rffmpeg_ffmpeg_command.append(config["fallback_ffdetect_command"])
         stdout = sys.stdout
     else:
         rffmpeg_ffmpeg_command.append(config["fallback_ffmpeg_command"])
